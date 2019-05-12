@@ -34,6 +34,10 @@ class MovingAverageCalculator:
         self._build_stream()
 
         for event in self.stream:
+            if not all(key in event for key in ('event_name', 'duration')):
+                # If any of key does not exist, skip.
+                continue
+
             if event['event_name'] != 'translation_delivered':
                 # By pass those events, which do not match the required event type
                 continue
@@ -46,8 +50,11 @@ class MovingAverageCalculator:
             self.stream_collection[epoch_time]['duration_count'] += event['duration']
             self.stream_collection[epoch_time]['elements'] += 1
 
-        self.min_time_stamp = min(self.stream_collection.keys())
-        self.max_time_stamp = max(self.stream_collection.keys())
+        if len(self.stream_collection.keys()) > 0:
+            self.min_time_stamp = min(self.stream_collection.keys())
+            self.max_time_stamp = max(self.stream_collection.keys())
+        else:
+            self.max_time_stamp = self.min_time_stamp = None
 
     def _build_stream(self):
         """
@@ -72,6 +79,8 @@ class MovingAverageCalculator:
         self._parse_stream()
 
         initial_timestamp, last_timestamp = self.min_time_stamp, self.max_time_stamp
+        if not initial_timestamp or not last_timestamp:
+            return
         minutes_delta = int((last_timestamp - initial_timestamp) / 60) + 2
 
         total_event_count = 0
@@ -85,7 +94,7 @@ class MovingAverageCalculator:
 
             if self.moving_avg_queue.qsize() == self.window_size + 1:
                 # If the queue size is greater than what is required
-                # Remove the first element from of queue and update the total count and duration of events
+                # Remove the first element from the queue and update the total count and duration of events.
                 previous_duration, previous_events = self.moving_avg_queue.get()
                 total_event_count -= previous_events
                 total_duration_count -= previous_duration
@@ -96,12 +105,15 @@ class MovingAverageCalculator:
             self._write_to_output_stream(timestamp_by_minute, average_delivery_time)
 
             if time_window in self.stream_collection:
+                # Calculate the current duration of events and the number of events in this time window.
                 current_event_count = self.stream_collection[time_window]['elements']
                 current_duration_count = self.stream_collection[time_window]['duration_count']
 
+            # Update the total duration and total count
             total_event_count += current_event_count
             total_duration_count += current_duration_count
 
+            # Dump it into the queue for later usage.
             self.moving_avg_queue.put((current_duration_count, current_event_count))
 
     def _write_to_output_stream(self, date, moving_avg):

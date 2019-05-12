@@ -11,6 +11,7 @@ class TimeHelper:
     @classmethod
     def to_epoch(cls, timestamp, time_format='%Y-%m-%d %H:%M:%S.%f'):
         """
+        Convert a given timestamp to epoch time.
 
         :param timestamp: Date time string
         :param time_format: Date time string. eg: 2018-12-26 18:11:08.509654
@@ -21,7 +22,7 @@ class TimeHelper:
             epoch_time = time.mktime(date.timetuple())
             return epoch_time
         except ValueError:
-            print("Incorrect timestamp passed: {0}".format(timestamp))
+            print("\nError: Incorrect timestamp passed: {0}".format(timestamp))
             system.exit()
 
     @classmethod
@@ -37,6 +38,7 @@ class TimeHelper:
     @classmethod
     def get_minute_from_timestamp(cls, timestamp):
         """
+        Helper function to convert the epoch time to minute timestamp.
 
         :param timestamp: Epoch time to be converted to required date and minutes., eg: 1545828139.0 -> 2018-12-26 18:12:00
         :return: The the converted epoch to minutes
