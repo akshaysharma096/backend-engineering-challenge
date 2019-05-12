@@ -21,7 +21,7 @@ class MovingAverageCalculator:
         self.source_file = source_file
         self.output_file = output_file
         self.stream_collection = {}
-        self.stream = []
+        self.input_stream = []
         self.output_stream = deque()
         self.window_size = window_size
         self.moving_avg_queue = Queue()
@@ -33,7 +33,7 @@ class MovingAverageCalculator:
         """
         self._build_stream()
 
-        for event in self.stream:
+        for event in self.input_stream:
             if not all(key in event for key in ('event_name', 'duration')):
                 # If any of key does not exist, skip.
                 continue
@@ -50,6 +50,7 @@ class MovingAverageCalculator:
             self.stream_collection[epoch_time]['duration_count'] += event['duration']
             self.stream_collection[epoch_time]['elements'] += 1
 
+        # If all the events are invalid, we need to do nothing.
         if len(self.stream_collection.keys()) > 0:
             self.min_time_stamp = min(self.stream_collection.keys())
             self.max_time_stamp = max(self.stream_collection.keys())
@@ -65,7 +66,7 @@ class MovingAverageCalculator:
             with open(self.source_file) as file:
                 for line in file:
                     event = json.loads(line)
-                    self.stream.append(event)
+                    self.input_stream.append(event)
         except json.decoder.JSONDecodeError:
             print("\nError: Input file {0}, is not a valid JSON file.".format(self.source_file))
             system.exit()
@@ -79,8 +80,10 @@ class MovingAverageCalculator:
         self._parse_stream()
 
         initial_timestamp, last_timestamp = self.min_time_stamp, self.max_time_stamp
+
         if not initial_timestamp or not last_timestamp:
             return
+
         minutes_delta = int((last_timestamp - initial_timestamp) / 60) + 2
 
         total_event_count = 0

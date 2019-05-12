@@ -69,6 +69,12 @@ The output file would be something in the following format.
 ```
 
 #### Akshay's Notes
+Assumptions:
+- Window size is at least greater than or equal to 1
+
+- The input file is a valid JSON file.
+
+- Invalid file or wrongly formatted file will halt the application, same is the case for window size.
 
 The problem has been solved by building it as a production ready software.
 
@@ -78,8 +84,12 @@ The solution is built around the queueing mechanism of adding an removing events
 - The problem is a sliding window problem, which can be solved in the most simplest way using a queue.
 - My approach uses an internal queue to keep track of the number of events happened per minute and the total duration of those events, for the window of X minutes.
 -  The size of the internal queue signifies the window size.
+
 - To simplify more, I have started with grouping the events based on the basis of the minute timestamp(epoch time) they occurred.
     - Once we group them, it becomes very simple to architect the solution using a queue.
+    
+    - Once we group them by minute timestamp, based on the initial timestamp and final timestamp, we can go over the events easily and our internal queue will take care of our window size.
+    
 - The queueing mechanism allows use to remove the dependency to cycle over the events again and again, thus our code runs fast.
 - The code has been made modular by methods to carry out small tasks, this makes it easy to read as well as easily debuggable.
 - The code runs with a runtime complexity of *O(n)*, where *n* is the number of events passed in the source file.
