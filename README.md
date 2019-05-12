@@ -57,15 +57,15 @@ The output file would be something in the following format.
 {"date": "2018-12-26 18:13:00", "average_delivery_time": 20}
 {"date": "2018-12-26 18:14:00", "average_delivery_time": 20}
 {"date": "2018-12-26 18:15:00", "average_delivery_time": 20}
-{"date": "2018-12-26 18:16:00", "average_delivery_time": 25,5}
-{"date": "2018-12-26 18:17:00", "average_delivery_time": 25,5}
-{"date": "2018-12-26 18:18:00", "average_delivery_time": 25,5}
-{"date": "2018-12-26 18:19:00", "average_delivery_time": 25,5}
-{"date": "2018-12-26 18:20:00", "average_delivery_time": 25,5}
-{"date": "2018-12-26 18:21:00", "average_delivery_time": 25,5}
+{"date": "2018-12-26 18:16:00", "average_delivery_time": 25.5}
+{"date": "2018-12-26 18:17:00", "average_delivery_time": 25.5}
+{"date": "2018-12-26 18:18:00", "average_delivery_time": 25.5}
+{"date": "2018-12-26 18:19:00", "average_delivery_time": 25.5}
+{"date": "2018-12-26 18:20:00", "average_delivery_time": 25.5}
+{"date": "2018-12-26 18:21:00", "average_delivery_time": 25.5}
 {"date": "2018-12-26 18:22:00", "average_delivery_time": 31}
 {"date": "2018-12-26 18:23:00", "average_delivery_time": 31}
-{"date": "2018-12-26 18:24:00", "average_delivery_time": 42,5}
+{"date": "2018-12-26 18:24:00", "average_delivery_time": 42.5}
 ```
 
 #### Notes
@@ -81,6 +81,42 @@ Feel free to, in your solution, include some your considerations while doing thi
 Also if you have any problem please **open an issue**. 
 
 Good luck and may the force be with you
+
+#### Akshay's Notes
+
+- The problem is a sliding window problem, which can be solved in the most simplest way using a queue.
+
+- My approach uses an internal queue to keep track of the number of events happened per minute and the total duration of those events, for the window of X minutes.
+
+-  The size of the internal queue signifies the window size.
+
+- To simplify more, I have started with grouping the events based on the basis of the minute timestamp(epoch time) they occurred.
+    - Once we group them, it becomes very simple to architect the solution using a queue.
+    
+- The code has been made modular by methods to carry out small tasks, this makes it easy to read as well as easily debuggable.
+
+- The code runs with a runtime complexity of *O(n)*, where *n* is the number of events passed in the source file.
+
+- The code has a space complexity of *O(n)* also, as we internally group the events using the minute timestamp.
+
+
+##### Additional cases
+- An important edge is to consider is the case, where window size is 1. 
+
+- Another important edge case to remove those events whose *event_name* is not part of what the problem has asked, i.e *translation_delivered*.
+
+- Handle bad timestamps, the application should stop if input data is wrongly formatted.
+
+- Handling files with invalid formatting needs to handled, or non JSON files.
+   
+#### How to run
+- The code has been written using Python3.6
+
+- You can run the command line app using the command.
+
+```buildoutcfg
+python3 moving_average.py -i input.json -w 20 -o result.json
+```
 
 #### Extra points
 
