@@ -74,6 +74,7 @@ The output file would be something in the following format.
 - Window size is at least greater than or equal to 1
 - The input file is a valid JSON file.
 - Invalid file or wrongly formatted file will halt the application, same is the case for window size.
+- **The timestamp of events in the input file are not sorted by default, they can come up in any order.**
 
 The problem has been solved by building it as a production ready software.
 
